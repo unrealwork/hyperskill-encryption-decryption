@@ -1,0 +1,36 @@
+type: edu
+custom_name: stage2
+files:
+- name: test/EncryptDecryptTest.java
+  visible: false
+  learner_created: false
+- name: src/encryptdecrypt/Main.java
+  visible: true
+  text: |
+    package encryptdecrypt;
+
+    public class Main {
+        public static void main(String[] args) {
+            System.out.println(encrypt("we found a treasure!"));
+        }
+
+        private static String encrypt(final String message) {
+            return message.chars()
+                    .map(Main::encryptCharacter)
+                    .collect(StringBuilder::new,
+                    StringBuilder::appendCodePoint,
+                    StringBuilder::append)
+                    .toString();
+        }
+
+        private static Character encryptCharacter(final int c) {
+            if (c >= 'a' && c <= 'z') {
+                return (char) ('z' - c + 'a');
+            }
+            return (char)c;
+        }
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/projects/46/stages/246/implement
+status: Failed
+record: 1

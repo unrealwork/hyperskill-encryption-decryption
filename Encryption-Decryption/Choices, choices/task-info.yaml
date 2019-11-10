@@ -1,0 +1,285 @@
+type: edu
+custom_name: stage6
+files:
+- name: test/EncryptDecryptTest.java
+  visible: false
+  learner_created: false
+- name: src/encryptdecrypt/Main.java
+  visible: true
+  text: |
+    package encryptdecrypt;
+
+    import java.util.function.BiFunction;
+
+    public class Main {
+        public static void main(String[] args) {
+            try {
+                var conf = ConfigurationUtils.parseFromArgs(args);
+                var reader = new ContentReader(conf);
+                var content = reader.read();
+                var crypt = Crypt.valueOf(conf.getMode());
+                var cryptedContent = crypt.encode(content, conf.getKey());
+                var writer = new ContentWriter(conf);
+                writer.write(cryptedContent);
+            } catch (Exception e) {
+                System.out.printf("Error : %s%n", e);
+            }
+
+        }
+
+        private enum Crypt {
+            ENC(Main::encryptWithKey), DEC(Main::decryptWithKey);
+            private final BiFunction<Character,Integer,Character> encodeFunction;
+
+            Crypt(BiFunction<Character, Integer, Character> encodeFunction) {
+                this.encodeFunction = encodeFunction;
+            }
+
+
+            public String encode(String message, int key) {
+                return message.chars()
+                        .map(c -> encodeFunction.apply((char)c, key))
+                        .collect(StringBuilder::new,
+                                StringBuilder::appendCodePoint,
+                                StringBuilder::append)
+                        .toString();
+            }
+        }
+
+        private static Character encryptWithKey(final int c, final int key) {
+            return (char) (c + key);
+        }
+
+        private static Character decryptWithKey(final int c, final int key) {
+            return encryptWithKey(c, -key);
+        }
+    }
+  learner_created: false
+- name: src/encryptdecrypt/Configuration.java
+  visible: true
+  text: |-
+    package encryptdecrypt;
+
+    class Configuration {
+        private String outPath;
+        private String inPath;
+        private String mode = "ENC";
+        private int key = 0;
+        private String data;
+
+        public String getOutPath() {
+            return outPath;
+        }
+
+        public void setOutPath(String outPath) {
+            this.outPath = outPath;
+        }
+
+        public String getInPath() {
+            return inPath;
+        }
+
+        public void setInPath(String inPath) {
+            this.inPath = inPath;
+        }
+
+        public String getMode() {
+            return mode;
+        }
+
+        public void setMode(String mode) {
+            this.mode = mode;
+        }
+
+        public int getKey() {
+            return key;
+        }
+
+        public void setKey(int key) {
+            this.key = key;
+        }
+
+        public String getData() {
+            return data;
+        }
+
+        public void setData(String data) {
+            this.data = data;
+        }
+    }
+  learner_created: false
+- name: src/encryptdecrypt/ConfigurationUtils.java
+  visible: true
+  text: |
+    package encryptdecrypt;
+
+    public class ConfigurationUtils {
+        private ConfigurationUtils () {
+
+        }
+
+        public static Configuration parseFromArgs(final String[] args) throws ConfigurationParsingException {
+            try {
+                var conf = new Configuration();
+                for (var i = 0; i<args.length; i+=2) {
+                    var value = args[i+1];
+                    switch (args[i]) {
+                        case "-mode": {
+                            conf.setMode(value.toUpperCase());
+                            break;
+                        }
+                        case "-in": {
+                            conf.setInPath(value);
+                            break;
+                        }
+                        case "-out": {
+                            conf.setOutPath(value);
+                            break;
+                        }
+                        case "-data": {
+                            conf.setData(value);
+                            break;
+                        }
+                        case "-key": {
+                            conf.setKey(Integer.parseInt(value));
+                            break;
+                        }
+                    }
+                }
+                return conf;
+            } catch (Exception e) {
+                throw new ConfigurationParsingException(e);
+            }
+
+        }
+    }
+  learner_created: false
+- name: src/encryptdecrypt/ConfigurationParsingException.java
+  visible: true
+  text: |
+    package encryptdecrypt;
+
+    public class ConfigurationParsingException extends Exception {
+        public ConfigurationParsingException(Throwable cause) {
+            super(cause);
+        }
+    }
+  learner_created: false
+- name: src/encryptdecrypt/ContentReader.java
+  visible: true
+  text: |
+    package encryptdecrypt;
+
+    import java.io.BufferedReader;
+    import java.io.FileReader;
+    import java.io.IOException;
+    import java.util.stream.Collectors;
+
+    public class ContentReader {
+        private final Configuration configuration;
+
+        public ContentReader(Configuration conf) {
+            this.configuration = conf;
+        }
+
+        public String read() throws ContentReadingException {
+            if (configuration.getData() != null) {
+                return configuration.getData();
+            }
+            if (configuration.getInPath() != null) {
+                try (var reader = new BufferedReader(new FileReader(configuration.getInPath()))) {
+                    return reader.lines().collect(Collectors.joining(String.format("%n")));
+                } catch (IOException e) {
+                    throw new ContentReadingException(e);
+                }
+            }
+            return "";
+        }
+    }
+  learner_created: false
+- name: src/encryptdecrypt/ContentReadingException.java
+  visible: true
+  text: |
+    package encryptdecrypt;
+
+    public class ContentReadingException extends Exception {
+        public ContentReadingException(Throwable cause) {
+            super(cause);
+        }
+    }
+  learner_created: false
+- name: src/encryptdecrypt/ContentWriter.java
+  visible: true
+  text: |
+    package encryptdecrypt;
+
+    import java.io.FileWriter;
+    import java.io.IOException;
+
+    public class ContentWriter {
+        private final Configuration configuration;
+
+        public ContentWriter(Configuration configuration) {
+            this.configuration = configuration;
+        }
+
+        void write(final String content) throws ContentWritingException {
+            if (configuration.getOutPath() != null) {
+                try (var writer = new FileWriter(configuration.getOutPath())) {
+                    writer.write(content);
+                } catch (IOException e) {
+                    throw new ContentWritingException(e);
+                }
+            } else {
+                System.out.println(content);
+            }
+        }
+    }
+  learner_created: false
+- name: src/encryptdecrypt/ContentWritingException.java
+  visible: true
+  text: |
+    package encryptdecrypt;
+
+    import java.io.IOException;
+
+    public class ContentWritingException extends Exception {
+        public ContentWritingException(Throwable cause) {
+            super(cause);
+        }
+    }
+  learner_created: false
+- name: output.txt
+  visible: true
+  text: 111122223333
+  learner_created: false
+- name: src/encryptdecrypt/crypt/Crypt.java
+  visible: true
+  learner_created: true
+- name: src/encryptdecrypt/crypt/UnicodeCrypt.java
+  visible: true
+  learner_created: true
+- name: src/encryptdecrypt/crypt/ShiftCrypt.java
+  visible: true
+  learner_created: true
+- name: src/encryptdecrypt/crypt/CryptUtils.java
+  visible: true
+  learner_created: true
+- name: src/encryptdecrypt/crypt/CryptFactory.java
+  visible: true
+  learner_created: true
+- name: src/encryptdecrypt/crypt/CryptFactoryImpl.java
+  visible: true
+  learner_created: true
+- name: src/encryptdecrypt/crypt/Coder.java
+  visible: true
+  learner_created: true
+- name: src/encryptdecrypt/crypt/CoderFactory.java
+  visible: true
+  learner_created: true
+- name: src/encryptdecrypt/FieldDescription.java
+  visible: true
+  learner_created: true
+feedback_link: https://hyperskill.org/projects/46/stages/250/implement
+status: Solved
+record: -1

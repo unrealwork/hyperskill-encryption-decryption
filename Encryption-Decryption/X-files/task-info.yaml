@@ -1,0 +1,61 @@
+type: edu
+custom_name: stage5
+files:
+- name: test/EncryptDecryptTest.java
+  visible: false
+  learner_created: false
+- name: src/encryptdecrypt/Main.java
+  visible: true
+  text: "package encryptdecrypt;\n\nimport java.util.function.BiFunction;\n\npublic\
+    \ class Main {\n    public static void main(String[] args) {\n        var conf\
+    \ = new Configuration();\n        for (var i = 0; i<args.length; i+=2) {\n   \
+    \         var value = args[i+1];\n            switch (args[i]) {\n           \
+    \     case \"-mode\": {\n                    conf.mode = value.toUpperCase();\n\
+    \                    break;\n                }\n                case \"-data\"\
+    : {\n                    conf.data = value;\n                    break;\n    \
+    \            }\n                case \"-key\": {\n                    conf.key\
+    \ = Integer.parseInt(value);\n                    break;\n                }\n\
+    \            }\n        }\n        \n        var crypt = Crypt.valueOf(conf.mode);\n\
+    \        System.out.println(crypt.encode(conf.data, conf.key));\n    }\n\n\n \
+    \   private static class Configuration {\n        private String mode = \"ENC\"\
+    ;\n        private int key = 0;\n        private String data = \"\";\n    }\n\n\
+    \    private enum Crypt {\n        ENC(Main::encryptWithKey), DEC(Main::decryptWithKey);\n\
+    \        private final BiFunction<Character,Integer,Character> encodeFunction;\n\
+    \n        Crypt(BiFunction<Character, Integer, Character> encodeFunction) {\n\
+    \            this.encodeFunction = encodeFunction;\n        }\n\n\n        public\
+    \ String encode(String message, int key) {\n            return message.chars()\n\
+    \                    .map(c -> encodeFunction.apply((char)c, key))\n         \
+    \           .collect(StringBuilder::new,\n                            StringBuilder::appendCodePoint,\n\
+    \                            StringBuilder::append)\n                    .toString();\n\
+    \        }\n    }\n\n    private static Character encryptWithKey(final int c,\
+    \ final int key) {\n        return (char) (c + key);\n    }\n\n    private static\
+    \ Character decryptWithKey(final int c, final int key) {\n        return encryptWithKey(c,\
+    \ -key);\n    }\n}\n"
+  learner_created: false
+- name: src/encryptdecrypt/ContentWriter.java
+  visible: true
+  learner_created: true
+- name: src/encryptdecrypt/ContentReadingException.java
+  visible: true
+  learner_created: true
+- name: output.txt
+  visible: true
+  learner_created: true
+- name: src/encryptdecrypt/Configuration.java
+  visible: true
+  learner_created: true
+- name: src/encryptdecrypt/ContentWritingException.java
+  visible: true
+  learner_created: true
+- name: src/encryptdecrypt/ConfigurationUtils.java
+  visible: true
+  learner_created: true
+- name: src/encryptdecrypt/ConfigurationParsingException.java
+  visible: true
+  learner_created: true
+- name: src/encryptdecrypt/ContentReader.java
+  visible: true
+  learner_created: true
+feedback_link: https://hyperskill.org/projects/46/stages/249/implement
+status: Solved
+record: 2

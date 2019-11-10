@@ -1,0 +1,54 @@
+type: edu
+custom_name: stage4
+files:
+- name: test/EncryptDecryptTest.java
+  visible: false
+  learner_created: false
+- name: src/encryptdecrypt/Main.java
+  visible: true
+  text: |
+    package encryptdecrypt;
+
+    import java.util.Scanner;
+    import java.util.function.BiFunction;
+
+    public class Main {
+        public static void main(String[] args) {
+            var sc = new Scanner(System.in);
+            var crypt = Crypt.valueOf(sc.nextLine().trim().toUpperCase());
+            var s = sc.nextLine();
+            var key = sc.nextInt();
+            System.out.println(crypt.encode(s, key));
+        }
+
+        private enum Crypt {
+            ENC(Main::encryptWithKey), DEC(Main::decryptWithKey);
+            private final BiFunction<Character,Integer,Character> encodeFunction;
+
+            Crypt(BiFunction<Character, Integer, Character> encodeFunction) {
+                this.encodeFunction = encodeFunction;
+            }
+
+
+            public String encode(String message, int key) {
+                return message.chars()
+                        .map(c -> encodeFunction.apply((char)c, key))
+                        .collect(StringBuilder::new,
+                                StringBuilder::appendCodePoint,
+                                StringBuilder::append)
+                        .toString();
+            }
+        }
+
+        private static Character encryptWithKey(final int c, final int key) {
+            return (char) (c + key);
+        }
+
+        private static Character decryptWithKey(final int c, final int key) {
+            return encryptWithKey(c, -key);
+        }
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/projects/46/stages/248/implement
+status: Unchecked
+record: 5
