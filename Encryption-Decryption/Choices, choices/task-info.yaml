@@ -277,9 +277,6 @@ files:
 - name: src/encryptdecrypt/crypt/CoderFactory.java
   visible: true
   learner_created: true
-- name: src/encryptdecrypt/FieldDescription.java
-  visible: true
-  learner_created: true
 feedback_link: https://hyperskill.org/projects/46/stages/250/implement
 status: Solved
-record: -1
+record: 6
