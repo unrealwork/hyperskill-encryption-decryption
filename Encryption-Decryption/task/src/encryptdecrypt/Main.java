@@ -3,7 +3,6 @@ package encryptdecrypt;
 import encryptdecrypt.crypt.CoderFactory;
 import encryptdecrypt.crypt.CryptFactory;
 
-@FieldDescription(text = "a")
 public class Main {
     public static void main(String[] args) {
         try {
@@ -20,22 +19,5 @@ public class Main {
             System.out.printf("Error : %s%n", e);
         }
 
-    }
-}
-
-class SomeClass {
-
-    private static int field = 1;
-
-    static  {
-        field = Integer.MAX_VALUE;
-    }
-
-    public SomeClass(int val) {
-        field = val;
-    }
-
-    public static void main(String[] args) {
-        S
     }
 }
